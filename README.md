@@ -13,5 +13,5 @@ In the classifier file two types of classifiers are implemented; SVM and Naive B
 SVM classifies over 72% correct whereas the Naive Bayes classifier gets stuck at 61.7%. 
 
 #### Acknowledgements
-The idea for creating this dataset was sparked by the dataset from Rishabh Misra on Kaggle which contains English newsheadlines.
+The idea for creating this dataset was sparked by the dataset from Rishabh Misra on Kaggle which contains English news headlines.
 
