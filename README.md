@@ -1,4 +1,4 @@
-## Classifying-Dutch-news-headlines
+## Classifying Dutch news headlines of "de Speld"  and "Nu.nl" 
 
 #### Context on data
 This dataset contains news headlines of two Dutch newswebsites. Data was collected by myself using a webscraper.
