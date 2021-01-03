@@ -4,6 +4,9 @@
 This dataset contains news headlines of two Dutch newswebsites. Data was collected by myself using a webscraper.
 All sarcastic headlines were collected from the Speld.nl (the Dutch equivalent of The Onion) whereas all "normal" headlines were collected from newswebsite Nu.nl.
 
+#### Available data
+The "raw" headlines are available in the headlines_dataset.csv. The headlines that are already preprocessed are available in "input.csv" and "labels.csv".
+
 #### Data preprocessing
 The preprocessing file tokenizes the headlines and cleans the headlines of stop words and unnecessary symbols. The cleaning of the headlines could be further improved, for example it now only keeps symbols present in the alphabet.
 Subsequently the headlines are replaced by TF-IDF scores so that the data can be used to classify.
