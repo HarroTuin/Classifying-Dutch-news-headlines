@@ -1,16 +1,12 @@
 import collections
+from collections import Counter
 import math
+import timeit
 import pandas as pd
 import numpy as np
 import nltk
 from nltk.tokenize import word_tokenize
-from collections import Counter
-from sklearn import svm, naive_bayes
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import StratifiedKFold
-import timeit
 
 start = timeit.default_timer()
 
@@ -23,7 +19,7 @@ df = df.sample(frac=1).reset_index(drop=True)
 
 # Remove duplicates (news can be in multiple categories)
 df = df.drop_duplicates(subset=['headline'])#.reset_index(drop=True)
-#df = df[0:500] # to test code for smaller dataset
+# df = df[0:500] # to test code for smaller dataset
 
 # Tokenize headlines
 tokenized_headline = []
@@ -32,9 +28,9 @@ for headline in df['headline']:
     tokenized_headline.append(word)
 
 # Set stop words to Dutch and set unnecessary symbols
-stop_words = set(nltk.corpus.stopwords.words('dutch')) 
+stop_words = set(nltk.corpus.stopwords.words('dutch'))
 
-# Make words lowercase and filter stop words + unnecessary symbols 
+# Make words lowercase and filter stop words + unnecessary symbols
 headlines_filtered = []
 for headline in tokenized_headline:
     new_headline = []
@@ -46,9 +42,9 @@ for headline in tokenized_headline:
     headlines_filtered.append(new_headline)
 
 # Replaces headlines with tokenized and filtered headlines and shuffle rows
-df['headline'] = headlines_filtered       
-    
-# Count how often words occur   
+df['headline'] = headlines_filtered
+
+# Count how often words occur
 word_counts = collections.Counter(word for words in df['headline'] for word in words)
 
 # TF-IDF
@@ -61,7 +57,7 @@ for headline in headlines_filtered:
         # calculate TF
         freq_term = int(('%d' % (c[word])))
         num_word = len(headline)
-        tf = (freq_term / num_word)   
+        tf = (freq_term / num_word)
         # calculate IDF
         documents_w_t = 0 # = denominator of IDF formula
         for i in headlines_filtered:
@@ -69,8 +65,8 @@ for headline in headlines_filtered:
                 if j == word:
                     documents_w_t += 1
         idf = math.log(len(headlines_filtered)/documents_w_t)
-        
-        # calculate TF-IDF (TF * IDF) 
+
+        # calculate TF-IDF (TF * IDF)
         tfidf = tf*idf
         tfidf_message.append(tfidf)
     tfidf_list.append(tfidf_message)
@@ -80,11 +76,11 @@ max_words = 0 # max number of words per message
 for i in tfidf_list:
     if len(i) > max_words:
         max_words = len(i)
-        
-for i in tfidf_list: 
+
+for i in tfidf_list:
     while len(i) < max_words: # pad so every message matches length of longest message
         i.append(0)
-        
+
 # Convert list of lists into NumPy array
 length = max(map(len, tfidf_list))
 array = np.array([xi+[None]*(length-len(xi)) for xi in tfidf_list])
@@ -102,4 +98,4 @@ y.to_csv('labels.csv', index=False, header=False)
 
 stop = timeit.default_timer()
 
-print('Time: ', stop - start)  
+print('Time: ', stop - start)
