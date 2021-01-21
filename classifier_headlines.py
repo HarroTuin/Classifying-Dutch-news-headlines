@@ -1,12 +1,17 @@
-import timeit
+"""
+Multiple classifiers using K-Fold Cross validation
+"""
 
 import pandas as pd
 import numpy as np
-from sklearn import svm, naive_bayes
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
+from sklearn import naive_bayes
+from sklearn.model_selection import KFold
+from sklearn.neural_network import MLPClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 
-start = timeit.default_timer()
 
 # Import dataset
 X = pd.read_csv('input.csv')
@@ -16,15 +21,8 @@ y = pd.read_csv('labels.csv')
 X = np.array(X)
 y = np.array(y).ravel()
 
-# Split data into train and test data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# SVM classifier
-clf = svm.SVC(kernel='rbf', C=10, gamma=0.5)
-clf.fit(X_train, y_train)
-svm_pred = clf.predict(X_test)
-
-print("SVM Accuracy Score -> ", accuracy_score(svm_pred, y_test)*100)
+# Split initialize kfold split
+kf = KFold(n_splits=4, shuffle=True, random_state=44)
 
 # The commented code below can be used to search for optimal hyperparameters
 # parameters = {'kernel':['rbf'], 'C':[1,10], 'gamma':
@@ -37,11 +35,38 @@ print("SVM Accuracy Score -> ", accuracy_score(svm_pred, y_test)*100)
 
 # Naive Bayes classifier
 nb = naive_bayes.MultinomialNB()
-nb.fit(X_train, y_train)
-nb_pred = nb.predict(X_test)
+accuracy_nb = []
+for train, test in kf.split(X):
+    X_train = X[train]
+    X_test = X[test]
+    y_train = y[train]
+    y_test = y[test]
+    nb.fit(X_train, y_train)
+    accuracy_nb.append(nb.score(X_test, y_test))
 
-print("Naive Bayes Accuracy Score -> ", accuracy_score(nb_pred, y_test)*100)
+print("Naive Bayes Accuracy Score -> ", sum(accuracy_nb) / len(accuracy_nb))
 
-stop = timeit.default_timer()
+# # More classifiers
+names = ["kNN", "Linear SVM", "RBF SVM", "Decision Tree", "Random Forest",
+          "Neural Net", "AdaBoost"]
 
-print('Time: ', stop - start)
+classifiers = [
+    KNeighborsClassifier(3),
+    SVC(kernel="linear", C=0.025),
+    SVC(gamma=2, C=1),
+    DecisionTreeClassifier(max_depth=5),
+    RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
+    MLPClassifier(alpha=1, max_iter=1000),
+    AdaBoostClassifier()]
+
+for name, clf in zip(names, classifiers):
+    accuracy_pred = []
+    for train_index, test_index in kf.split(X, y):
+        X_train = X[train_index,:]
+        X_test = X[test_index,:]
+        y_train = y[train_index]
+        y_test = y[test_index]
+        clf.fit(X_train, y_train)
+        pred = clf.predict(X_test)
+        accuracy_pred.append(clf.score(X_test, y_test))
+    print("Accuracy:",name,sum(accuracy_pred) / len(accuracy_pred))
