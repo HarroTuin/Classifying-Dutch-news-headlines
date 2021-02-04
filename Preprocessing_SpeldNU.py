@@ -1,14 +1,12 @@
 import collections
 from collections import Counter
 import math
-import timeit
 import pandas as pd
 import numpy as np
 import nltk
 from nltk.tokenize import word_tokenize
 from sklearn.preprocessing import MinMaxScaler
 
-start = timeit.default_timer()
 
 # Import dataset
 df = pd.read_csv('headlines_dataset.csv')
@@ -95,7 +93,3 @@ y = df['is_sarcastic']
 
 X.to_csv('input.csv', index=False, header=False)
 y.to_csv('labels.csv', index=False, header=False)
-
-stop = timeit.default_timer()
-
-print('Time: ', stop - start)
