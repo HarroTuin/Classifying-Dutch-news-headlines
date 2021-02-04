@@ -1,5 +1,5 @@
 """
-Multiple classifiers using K-Fold Cross validation
+Multiple classifiers using K-Fold Cross validation with sampling strategy
 """
 
 import pandas as pd
@@ -11,7 +11,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-
+from imblearn.over_sampling import SMOTE
 
 # Import dataset
 X = pd.read_csv('input.csv')
@@ -20,6 +20,10 @@ y = pd.read_csv('labels.csv')
 # Convert df to np.array
 X = np.array(X)
 y = np.array(y).ravel()
+
+# Resample the minority class
+smote = SMOTE(sampling_strategy = 1 ,k_neighbors = 3, random_state=1)   
+X, y = smote.fit_sample(X, y)
 
 # Split initialize kfold split
 kf = KFold(n_splits=4, shuffle=True, random_state=44)
@@ -66,6 +70,7 @@ for name, clf in zip(names, classifiers):
         X_test = X[test_index,:]
         y_train = y[train_index]
         y_test = y[test_index]
+
         clf.fit(X_train, y_train)
         pred = clf.predict(X_test)
         accuracy_pred.append(clf.score(X_test, y_test))
